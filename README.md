@@ -9,3 +9,4 @@ This app get the latest tweets from @OmaniMOH, detect if a new case is posted an
 3. `pip install pushbullet.py`
 4. `conda install maya python-twitter`
 5. `pip install GetOldTweets3`
+6. `pip install googletrans`
