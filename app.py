@@ -14,7 +14,7 @@ PUSHBULLET_KEY = os.environ.get('PUSHBULLET_KEY')
 RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY')
 
 if None in (PUSHBULLET_KEY, RAPIDAPI_KEY):
-    print('Error: Please set your KEYs under confg')
+    print('Error: Please set your KEYs under enviroment variables (PUSHBULLET_KEY and RAPIDAPI_KEY)')
     sys.exit(0)
 
 
