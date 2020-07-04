@@ -12,3 +12,10 @@ This app get the latest tweets from @OmaniMOH, detect if a new case is posted an
 4. After the virtual environment is active, we are going to want to ensure that a couple of essential Python packages within the virtual environment are up to date: `(.venv) andrade@dell:/mnt/d/Dropbox/Python Projects/covid$` `pip install -U setuptools pip`
 5. Install the requirements: `(.venv) andrade@dell:/mnt/d/Dropbox/Python Projects/covid$` `pip install requests pushbullet.py`
 6. Open VSCode `(.venv) andrade@dell:/mnt/d/Dropbox/Python Projects/covid$` `code .`
+
+
+# Git
+
+1. `git config --global user.email "a@gmail.com"`
+2. `git config --global user.name "xandrade"`
+3. `rm -f ./.git/index.lock`
