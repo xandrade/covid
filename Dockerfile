@@ -1,5 +1,5 @@
 
-# cd "/mnt/d/Dropbox/Python Projects/twitter"
+# cd "/mnt/d/Dropbox/Python Projects/covid"
 # export DOCKER_CONTENT_TRUST=0
 # pip freeze > requirements.txt (remender to first activate the enviroment)
 # docker build -t covid-app .
@@ -10,7 +10,7 @@ RUN apk update
 # delete cache files
 RUN rm -vrf /var/cache/apk/*
 
-WORKDIR "/mnt/d/Dropbox/Python Projects/twitter"
+WORKDIR "/mnt/d/Dropbox/Python Projects/covid"
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
