@@ -1,7 +1,7 @@
 # covid
-Twitter Notificator for COVID-19 Oman
+Push notificator for COVID-19 statistics in Oman
 
-This app get the latest tweets from @OmaniMOH, detect if a new case is posted and send a PushBullet notification of new case is detected. Each notification is saved in a csv file.
+This app query the rapidapi.com API and push a notifcation if change is detected.
 
 
 # Linux (Ubuntu-20.04) through WSL 2
@@ -19,3 +19,7 @@ This app get the latest tweets from @OmaniMOH, detect if a new case is posted an
 1. `git config --global user.email "a@gmail.com"`
 2. `git config --global user.name "xandrade"`
 3. `rm -f ./.git/index.lock`
+
+# Docker container
+
+info for buiding the container and running is available at https://github.com/xandrade/covid/blob/master/Dockerfile
