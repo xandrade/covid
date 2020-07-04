@@ -10,7 +10,7 @@ RUN apk update
 # delete cache files
 RUN rm -vrf /var/cache/apk/*
 
-WORKDIR "/mnt/d/Dropbox/Python Projects/covid"
+WORKDIR "/mnt/d/Dropbox/Python Projects/covid1"
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
