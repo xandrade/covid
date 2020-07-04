@@ -1,71 +1,112 @@
-import twitter
-import maya
-import datetime
-import re
-import csv
-from pushbullet import Pushbullet
-import sched, time
+import requests
+import json
+import os
 import sys
+import sched
+import datetime
+import time
+from pushbullet import Pushbullet
 
-PUSHBULLET_KEY = 'o.TRIjBEQtbsnkYeKLkgFbtpFR2iQtKjyH'
+CACHE = None
+FIRST_NOTIFICATION = True
 
-def check_for_tweet():
-    api = twitter.Api(consumer_key='VGMEA0wDjnPEavVVKXtKCqWEY',
-                    consumer_secret='Vq5VSEv33tnd4voNn9gUjIGsXHwC7PeksUQVRW2bScC7AEIDXL',
-                    access_token_key='28278105-kYcdSzL1EtwzYd9YdomYveHEz1ZbZ7naiUuj0W1P5',
-                    access_token_secret='kO5C9UhKGeeSlCZxptXws5cGzmSTf2Y9TVv27QLX6smch')
+PUSHBULLET_KEY = os.environ.get('PUSHBULLET_KEY')
+RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY')
 
-    user = api.GetUser(screen_name='OmaniMOH')
+if None in (PUSHBULLET_KEY, RAPIDAPI_KEY):
+    print('Error: Please set your KEYs under confg')
+    sys.exit(0)
 
-    for tweet in api.GetUserTimeline(user_id=user.id, exclude_replies=True, count=200, include_rts=False):
-        if '\u062a\u0639\u0644\u0646 #\u0648\u0632\u0627\u0631\u0629_\u0627\u0644\u0635\u062d\u0629 \u0639\u0646 \u062a\u0633\u062c\u064a\u0644' in tweet.text:
-            # Automatically parse datetime strings and generate naive datetimes.
-            scraped = tweet.created_at
-            #print(maya.parse(scraped).datetime(naive=True) + datetime.timedelta(hours=4))
-            #print(tweet.text)
-            found = re.search('\([0-9]{1,}\)', tweet.text)
-            #print(found.group(0).replace('(', '').replace(')', ''))
-            
-            in_file = False
-            with open('./OmaniMOH.csv', newline='', encoding='utf-8') as csvfile:
-                spamreader = csv.reader(csvfile, delimiter='|')
-                for row in spamreader:
-                    #print(','.join(row))
-                    if ','.join(row) ==  ','.join([str(maya.parse(scraped).datetime(naive=True) + datetime.timedelta(hours=4)),
-                                                found.group(0).replace('(', '').replace(')', ''),tweet.text]):
-                        in_file = True
-            if not in_file:
-                with open('./OmaniMOH.csv', 'a+', newline='', encoding='utf-8') as wcsvfile:
-                    spamwriter = csv.writer(wcsvfile, delimiter='|')
-                    spamwriter.writerow([str(maya.parse(scraped).datetime(naive=True) + datetime.timedelta(hours=4)),
-                                            found.group(0).replace('(', '').replace(')', ''),tweet.text])
-                print('new record found',  ','.join([str(maya.parse(scraped).datetime(naive=True) + datetime.timedelta(hours=4)),
-                                                found.group(0).replace('(', '').replace(')', ''),tweet.text]))
-                return str(maya.parse(scraped).datetime(naive=True) + datetime.timedelta(hours=4)), found.group(0).replace('(', '').replace(')', ''), tweet.text
-    return None
 
+def call_api():
+
+    global CACHE
+
+    url = "https://covid-193.p.rapidapi.com/statistics"
+
+    querystring = {"country":"oman"}
+
+    headers = {
+        'x-rapidapi-host': "covid-193.p.rapidapi.com",
+        'x-rapidapi-key': RAPIDAPI_KEY
+        }
+
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+
+        if response.status_code == 200:
+
+            data = json.loads(response.text)
+
+            rc = {
+                'New Cases': data['response'][0]['cases']['new'],
+                'Active Cases': data['response'][0]['cases']['active'],
+                'Critical Cases': data['response'][0]['cases']['critical'],
+                'Recovered Cases': data['response'][0]['cases']['recovered'],
+                'Total Cases': data['response'][0]['cases']['total'],
+                'New Deaths': data['response'][0]['deaths']['new'],
+                'Total Deaths': data['response'][0]['deaths']['total'],
+                'Total Tests': data['response'][0]['tests']['total'],
+            }
+
+            hashed = hash(frozenset(rc.items()))
+
+            rc['Updated Time'] = data['response'][0]['time']
+            rc['Date'] = data['response'][0]['day']
+
+            if CACHE != hashed:
+                CACHE = hashed
+                print(data)
+                return rc
+
+        else:
+            print('rapidapi responded code', response.status_code)
+
+        return None
+        
+    except requests.exceptions.RequestException as e:
+        # catastrophic error. bail.
+        print(f'Error: {e}')
+        return None
+
+    
 def push_notification(title, body):
-    # push the message
+    # push the mes*sage
+    print('Pushing message')
     pb = Pushbullet(PUSHBULLET_KEY)
     push = pb.push_note(title, body)
+
 
 if __name__ == "__main__":
 
     s = sched.scheduler(time.time, time.sleep)
 
     def do_something(sc): 
-        print("Running Task", datetime.datetime.now(), end='\r')
         
-        tweet = check_for_tweet()
-        if tweet is not None:
-            created_at, number_infected, text = tweet
-            push_notification(f"COVID-19: {number_infected}", created_at + '\n' + text)
+        global FIRST_NOTIFICATION
+        
+        print("Running Task", datetime.datetime.now(), end='\r')
 
-        #sys.stdout.write("\033[K") # Clear to the end of line
+        data = call_api()
+        if data is not None:
+            value = ""
+            for k, v in data.items():
+                if k != 'Date':
+                    value += f'{k}: {v}\n'
+            else:
+                if FIRST_NOTIFICATION:
+                    push_notification(f"COVID-19: {data['Date']}", value)
+                else:
+                    FIRST_NOTIFICATION = True
+                
+                #message = f"[chatbot] #COVID-19 *{number_infected}* new cases recorded on {created_at} - {text}"
+                #dist_list = ('Test', ) #'PDO LOWIS/ForeSite', 'RTO Story telling' 'Martes de CERVEZA online')
+                #for to in dist_list:
+                #    wa.send_wa_message(to, message)
+
         print("Last Run Time", datetime.datetime.now(), flush=True)
 
-        s.enter(59, 1, do_something, (sc,))
+        s.enter(60*5, 1, do_something, (sc,))  # 60*2
 
     s.enter(0, 1, do_something, (s,))
     s.run()
-
