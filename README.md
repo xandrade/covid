@@ -3,7 +3,7 @@ Push-notification for COVID-19 statistics by country
 
 This app queries the rapidapi.com API and push a notifcation (using PushBullet API) if change is detected.
 
-![Test Image 3](/20-07-05-22-46-37_exported_12724_1593974877369.jpg)
+![Test Image 3](/demo-msg.jpg)
 
 
 # Linux (Ubuntu-20.04) through WSL 2
