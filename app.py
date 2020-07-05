@@ -12,6 +12,7 @@ FIRST_NOTIFICATION = True
 
 PUSHBULLET_KEY = os.environ.get('PUSHBULLET_KEY')
 RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY')
+COUNTRY = os.environ.get('COUNTRY')
 
 if None in (PUSHBULLET_KEY, RAPIDAPI_KEY):
     print('Error: Please set your KEYs under enviroment variables (PUSHBULLET_KEY and RAPIDAPI_KEY)')
@@ -24,7 +25,7 @@ def call_api():
 
     url = "https://covid-193.p.rapidapi.com/statistics"
 
-    querystring = {"country":"oman"}
+    querystring = {"country":COUNTRY}
 
     headers = {
         'x-rapidapi-host': "covid-193.p.rapidapi.com",
@@ -79,6 +80,8 @@ def push_notification(title, body):
 
 if __name__ == "__main__":
 
+    print(COUNTRY)
+
     s = sched.scheduler(time.time, time.sleep)
 
     def do_something(sc): 
@@ -95,7 +98,7 @@ if __name__ == "__main__":
                     value += f'{k}: {v}\n'
             else:
                 if FIRST_NOTIFICATION:
-                    push_notification(f"COVID-19: {data['Date']}", value)
+                    push_notification(f"COVID-19 ({COUNTRY}): {data['Date']}", value)
                 else:
                     FIRST_NOTIFICATION = True
                 

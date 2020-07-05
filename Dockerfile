@@ -3,7 +3,7 @@
 # export DOCKER_CONTENT_TRUST=0
 # pip freeze > requirements.txt (remender to first activate the enviroment)
 # docker build -t covid-app .
-# docker run --name covid-app --env PUSHBULLET_KEY='key goes here' --env RAPIDAPI_KEY='key goes here' -d --restart unless-stopped covid-app 
+# docker run --name covid-app-oman --env PUSHBULLET_KEY='key goes here' --env RAPIDAPI_KEY='key goes here' -e COUNTRY=oman -d --restart unless-stopped covid-app
 
 FROM python:3-alpine
 RUN apk update
