@@ -1,7 +1,11 @@
 # covid
-Push-notification for COVID-19 statistics in Oman
+Push-notification for COVID-19 statistics by country
 
 This app queries the rapidapi.com API and push a notifcation (using PushBullet API) if change is detected.
+
+
+
+
 
 
 # Linux (Ubuntu-20.04) through WSL 2
