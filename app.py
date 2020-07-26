@@ -23,6 +23,7 @@ def call_api():
 
     global CACHE
 
+    # https://rapidapi.com/Gramzivi/api/covid-19-data
     url = "https://covid-193.p.rapidapi.com/statistics"
 
     querystring = {"country":COUNTRY}

@@ -10,7 +10,7 @@ RUN apk update
 # delete cache files
 RUN rm -vrf /var/cache/apk/*
 
-WORKDIR "/mnt/d/Dropbox/Python Projects/covid"
+WORKDIR "/usr/src/app"
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
@@ -21,8 +21,6 @@ RUN pip install -U setuptools pip
 # Install dependencies:
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY confg.py .
 
 # Run the application:
 COPY app.py .
